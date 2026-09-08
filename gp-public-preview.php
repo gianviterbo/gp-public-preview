@@ -801,7 +801,16 @@ class GP_Public_Preview {
 		$started = (int) get_post_meta( $post_id, 'gp_ppp_started', true );
 		if ( ! $started ) {
 			$post    = get_post( $post_id );
-			$started = $post ? strtotime( $post->post_modified_gmt ) : time();
+			$started = 0;
+			if ( $post ) {
+				$t = strtotime( $post->post_modified_gmt );
+				if ( ! $t || $t < 0 ) {
+					$t = strtotime( $post->post_modified ); // zero-gmt fallback.
+				}
+				$started = ( $t && $t > 0 ) ? $t : time();
+			} else {
+				$started = time();
+			}
 		}
 
 		return $started;
